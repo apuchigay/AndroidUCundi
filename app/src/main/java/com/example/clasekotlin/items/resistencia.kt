@@ -3,10 +3,12 @@ package com.example.clasekotlin.items
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlin.math.pow
+import java.text.DecimalFormat
 
 val colores = listOf("Negro", "Marrón", "Rojo", "Naranja", "Amarillo", "Verde", "Azul", "Violeta", "Gris", "Blanco")
 
@@ -18,19 +20,32 @@ fun Interfaz() {
     var multiplicador by remember { mutableStateOf(colores[0]) }
     var resistencia by remember { mutableStateOf("0 Ω") }
 
+    // Función para formatear la resistencia con separador de miles
+    fun formatearResistencia(valor: Double): String {
+        val formatter = DecimalFormat("#,###") // Formato con separador de miles
+        return if (valor % 1.0 == 0.0) {
+            "${formatter.format(valor.toInt())} Ω" // Mostrar como entero si no tiene decimales
+        } else {
+            "${formatter.format(valor)} Ω" // Mostrar con decimales si es necesario
+        }
+    }
+
     // Función para calcular la resistencia
     fun calcularResistencia() {
         val valorBanda1 = colores.indexOf(banda1) * 10
         val valorBanda2 = colores.indexOf(banda2)
         val valorMultiplicador = 10.0.pow(colores.indexOf(multiplicador).toDouble())
         val resultado = (valorBanda1 + valorBanda2) * valorMultiplicador
-        resistencia = "$resultado Ω"
+
+        resistencia = formatearResistencia(resultado)
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .wrapContentSize(Alignment.Center) // Centramos todo el contenido
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         DropdownSelector("Selecciona Banda 1", banda1) { nuevoValor ->
             banda1 = nuevoValor
@@ -62,7 +77,7 @@ fun DropdownSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, style = MaterialTheme.typography.bodyLarge)
         ExposedDropdownMenuBox(
             expanded = expanded,
